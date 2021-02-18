@@ -4,7 +4,7 @@ A simple model containing three species (Aa, Bb and Cc) that diffuse in a cell g
 
 A particle of Aa type turns into a Bb type with a rate of 1 1/s (giving a dwell timer of 1 s), Bb type turn into Cc type with a rate of 0.2 1/s (giving a dwell time of 5 s) and Cc type turn into Aa type with a rate of 2 1/s (giving a dwell time of 0.5 s).
 
-In the beginning there are 1000 particles of the type Bb and the simulation run for 10.5 seconds (simulated time) to equilibrate the system, and then continue to run until 40 seconds (simulated time).
+In the beginning there are 500 particles of the type Bb and the simulation run for 10.5 seconds (simulated time) to equilibrate the system, and then continue to run until 40 seconds (simulated time).
 
 The geometry of the cell is divided into small cubes with sides of a length 0.01 um. The scale used for the coordinates are in cubes.
 
