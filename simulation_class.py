@@ -22,6 +22,7 @@ class MesoRDsimulation:
 		trajectories_file = os.path.join(sim_directory, 'trajectories.txt')
 		reactions_file = os.path.join(sim_directory, 'reactions.txt')
 		trajectories = pd.read_csv(trajectories_file,sep = ' ', header=None)
+		self.reactions = pd.read_csv(reactions_file,sep = ' ', header=None).sort_values(by=[1,0])
 		self.time = trajectories.iloc[:,0]
 		self.IDs = trajectories.iloc[:,1::5]
 		self.species = trajectories.iloc[:,2::5]
@@ -35,10 +36,7 @@ class MesoRDsimulation:
 		self.z_coord.columns =  [str(i) for i in range(len(self.z_coord.columns))]
 		
 		self.species_order = self.species.melt().value.unique()
-		
-		# some random things done when trying to calculate things
-		#uu2 = pd.read_csv('simulation_example/reactions.txt',sep = ' ', header=None)
-		#uu2.iloc[:,2].unique() # species
+
 
 	def get_species(self):
 		''' return a list of the different species in the simulation. Need not be sorted
@@ -85,22 +83,48 @@ class MesoRDsimulation:
 		'''
 		'''
 		return self.__get_D_values__(threshold).groupby('species').std().loc[self.species_order]
-		
+
+	def __get_DT_values__(self, threshold):
+		'''
+		'''
+		return pd.DataFrame({'species': self.reactions[self.reactions[0] >= threshold].iloc[:,2], 'diff':self.reactions[self.reactions[0] >= threshold].groupby(1)[0].diff().shift(-1)})
+		#self.reactions[self.reactions[0] >= threshold].groupby(1)[0].diff().shift(-1)
+		# some random things done when trying to calculate things
+		#uu2 = pd.read_csv('simulation_example/reactions.txt',sep = ' ', header=None)
+		#uu3 = uu2.sort_values(by=[1,0])
+		#uu3[6] = uu3.groupby(1)[0].diff().shift(-1)
+		#uu3.groupby(2).mean()
+		#uu2.iloc[:,2].unique() # species
+
+	def get_DT_mean(self, threshold = 0):
+		'''
+		'''
+		return self.__get_DT_values__(threshold).groupby('species').mean().loc[self.species_order]
+
+	def get_DT_sd(self, threshold = 0):
+		'''
+		'''
+		return self.__get_DT_values__(threshold).groupby('species').std().loc[self.species_order]
+
 # for testing purposes
 if __name__ == "__main__":
 	new_sim = MesoRDsimulation('simulation_example',0.01)
+	new_sim.set_species_order(["Aa","Bb","Cc"])
 	print(new_sim.get_species())
-	#print("pOcc")
-	#print(new_sim.get_pOcc_mean())
-	#print(new_sim.get_pOcc_mean(20))
+	print("pOcc")
+	print(new_sim.get_pOcc_mean())
+	print(new_sim.get_pOcc_mean(20))
 	#print(new_sim.get_pOcc_sd())
 	#print(new_sim.get_pOcc_sd(20))
-	#print("D")
+	print("D")
 	print(new_sim.get_D_mean())
 	print(new_sim.get_D_sd())
 
-	print(new_sim.get_D_mean(20))
-	print(new_sim.get_D_sd(20))
+	#print(new_sim.get_D_mean(20))
+	#print(new_sim.get_D_sd(20))
+	print("DT")
+	print(new_sim.get_DT_mean())
+	print(new_sim.get_DT_sd())
 
 	#print(new_sim.get_pOcc_mean())
 	#new_sim.set_species_order(["Aa","Bb","Cc"])
