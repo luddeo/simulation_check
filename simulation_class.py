@@ -8,6 +8,8 @@
 import pandas as pd
 import numpy as np
 import os
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
 
 class MesoRDsimulation:
@@ -36,6 +38,9 @@ class MesoRDsimulation:
 		self.z_coord.columns =  [str(i) for i in range(len(self.z_coord.columns))]
 		
 		self.species_order = self.species.melt().value.unique()
+		self.color_list = {}
+		for s in range(len(self.species_order)):
+			self.color_list.update({self.species_order[s]:list(mcolors.TABLEAU_COLORS.values())[s]}) 
 
 
 	def get_species(self):
@@ -106,25 +111,60 @@ class MesoRDsimulation:
 		'''
 		return self.__get_DT_values__(threshold).groupby('species').std().loc[self.species_order]
 
+	def plot_Occ(self, threshold = 0):
+		'''
+		'''
+		fig, ax = plt.subplots()
+		for label, data in self.species.iloc[self.time.values >= threshold, :].apply(pd.Series.value_counts, axis=1).items():
+			ax.plot(self.time.iloc[self.time.values >= threshold],data,color=self.color_list[label], label=label)
+		ax.set_title('Occupancy')
+		ax.set_xlabel(r'time (s)')
+		ax.set_ylabel(r'number of particles')
+		ax.legend(loc=0)
+		plt.show()
+	
+	def plot_trajectory(self, id, threshold = 0):
+		'''
+		'''
+		fig, ax = plt.subplots()
+		for i in range(len(self.x_coord.iloc[:,id])-1):
+			ax.plot(self.x_coord.iloc[i:(i+2),id],self.y_coord.iloc[i:(i+2),id], color=self.color_list[self.species.iloc[i,id]])
+		ax.set_aspect(1)
+		plt.show()
+
+	def set_colors(self, color_set):
+		'''
+		'''
+		if (self.color_list.keys() == color_set.keys()):
+			self.color_list = color_set
+		else:
+			raise Exception("the keys does not match")#Need a more specific exception
+		
+
 # for testing purposes
 if __name__ == "__main__":
 	new_sim = MesoRDsimulation('simulation_example',0.01)
 	new_sim.set_species_order(["Aa","Bb","Cc"])
-	print(new_sim.get_species())
-	print("pOcc")
-	print(new_sim.get_pOcc_mean())
-	print(new_sim.get_pOcc_mean(20))
+	#new_sim.plot_Occ(20)
+	print(new_sim.color_list)
+	#new_sim.set_colors({"Aa":"#FF0000", "Bb": "#00FF00", "Cc": "#0000FF"})
+	#new_sim.plot_Occ(20)
+	new_sim.plot_trajectory(30)
+	#print(new_sim.get_species())
+	#print("pOcc")
+	#print(new_sim.get_pOcc_mean())
+	#print(new_sim.get_pOcc_mean(20))
 	#print(new_sim.get_pOcc_sd())
 	#print(new_sim.get_pOcc_sd(20))
-	print("D")
-	print(new_sim.get_D_mean())
-	print(new_sim.get_D_sd())
+	#print("D")
+	#print(new_sim.get_D_mean())
+	#print(new_sim.get_D_sd())
 
 	#print(new_sim.get_D_mean(20))
 	#print(new_sim.get_D_sd(20))
-	print("DT")
-	print(new_sim.get_DT_mean())
-	print(new_sim.get_DT_sd())
+	#print("DT")
+	#print(new_sim.get_DT_mean())
+	#print(new_sim.get_DT_sd())
 
 	#print(new_sim.get_pOcc_mean())
 	#new_sim.set_species_order(["Aa","Bb","Cc"])
