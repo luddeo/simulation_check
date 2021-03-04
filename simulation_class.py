@@ -95,6 +95,7 @@ class MesoRDsimulation:
 		return pd.DataFrame({'species': self.reactions[self.reactions[0] >= threshold].iloc[:,2], 'diff':self.reactions[self.reactions[0] >= threshold].groupby(1)[0].diff().shift(-1)})
 		#self.reactions[self.reactions[0] >= threshold].groupby(1)[0].diff().shift(-1)
 		# some random things done when trying to calculate things
+		#uu = pd.read_csv('simulation_example/trajectories.txt',sep = ' ', header=None)
 		#uu2 = pd.read_csv('simulation_example/reactions.txt',sep = ' ', header=None)
 		#uu3 = uu2.sort_values(by=[1,0])
 		#uu3[6] = uu3.groupby(1)[0].diff().shift(-1)
@@ -123,13 +124,79 @@ class MesoRDsimulation:
 		ax.legend(loc=0)
 		plt.show()
 	
-	def plot_trajectory(self, id, threshold = 0):
+	def plot_trajectory(self, id, axis = "x", threshold = 0):
 		'''
+			axis is the axis to project down on,  practicaly just means it is the coordinate that will not be ploted.
 		'''
 		fig, ax = plt.subplots()
-		for i in range(len(self.x_coord.iloc[:,id])-1):
-			ax.plot(self.x_coord.iloc[i:(i+2),id],self.y_coord.iloc[i:(i+2),id], color=self.color_list[self.species.iloc[i,id]])
+		if axis == "x":
+			coord1 = self.y_coord.iloc[:,id]
+			coord2 = self.z_coord.iloc[:,id]
+			ax.set_xlabel(r'y-axis')
+			ax.set_ylabel(r'z-axis')
+		elif axis == "y":
+			coord1 = self.x_coord.iloc[:,id]
+			coord2 = self.z_coord.iloc[:,id]
+			ax.set_xlabel(r'x-axis')
+			ax.set_ylabel(r'z-axis')
+		elif axis == "z":
+			coord1 = self.x_coord.iloc[:,id]
+			coord2 = self.y_coord.iloc[:,id]
+			ax.set_xlabel(r'x-axis')
+			ax.set_ylabel(r'y-axis')
+		else:
+			raise Exception("Not a correct axis")#Need a more specific exception
+		local_species_list = self.species.iloc[:,id]
+		for i in range(len(coord1)-1):
+			ax.plot(coord1.iloc[i:(i+2)], coord2.iloc[i:(i+2)], color=self.color_list[local_species_list.iloc[i]])
 		ax.set_aspect(1)
+		#trying to make a legend, does not work like I want it to, and not that important later. So skip for now.
+		#ax.legend(loc=0, labels=list(self.color_list.keys()), labelcolor=list(self.color_list.values()))
+		plt.show()
+		
+	def plot_trajectory_radial(self, id, axis = "z", threshold = 0):
+		'''
+			axis is the axis that will be the non radial part
+		'''
+		fig, ax = plt.subplots()
+		if axis == "x":
+			coord1 = self.x_coord.iloc[:,id]
+			coord2 = np.sqrt(self.y_coord.iloc[:,id].pow(2) + self.z_coord.iloc[:,id].pow(2))
+			ax.set_xlabel(r'x-axis')
+			ax.set_ylabel(r'radial')
+		elif axis == "y":
+			coord1 = self.y_coord.iloc[:,id]
+			coord2 = np.sqrt(self.z_coord.iloc[:,id].pow(2) + self.x_coord.iloc[:,id].pow(2))
+			ax.set_xlabel(r'y-axis')
+			ax.set_ylabel(r'radial')
+		elif axis == "z":
+			coord1 = self.z_coord.iloc[:,id]
+			coord2 = np.sqrt(self.y_coord.iloc[:,id].pow(2) + self.x_coord.iloc[:,id].pow(2))
+			ax.set_xlabel(r'z-axis')
+			ax.set_ylabel(r'radial')
+		else:
+			raise Exception("Not a correct axis")#Need a more specific exception
+		local_species_list = self.species.iloc[:,id]
+		for i in range(len(coord1)-1):
+			ax.plot(coord1.iloc[i:(i+2)], coord2.iloc[i:(i+2)], color=self.color_list[local_species_list.iloc[i]])
+		ax.set_aspect(1)
+		#trying to make a legend, does not work like I want it to, and not that important later. So skip for now.
+		#ax.legend(loc=0, labels=list(self.color_list.keys()), labelcolor=list(self.color_list.values()))
+		plt.show()
+		
+	def plot_hist(self, id, axis = "z", threshold = 0, bins = 30):
+		'''
+			axis is the axis that will be the non radial part
+		'''
+		if axis == "x":
+			coord1 = self.x_coord.iloc[:,id]
+		elif axis == "y":
+			coord1 = self.y_coord.iloc[:,id]
+		elif axis == "z":
+			coord1 = self.z_coord.iloc[:,id]
+		else:
+			raise Exception("Not a correct axis")#Need a more specific exception
+		fig, ax = pd.DataFrame({'species': self.species[self.time.values >= threshold].iloc[:,id], 'coord':coord1[self.time.values >= threshold]}).hist(by = 'species', bins = bins)
 		plt.show()
 
 	def set_colors(self, color_set):
@@ -149,7 +216,7 @@ if __name__ == "__main__":
 	print(new_sim.color_list)
 	#new_sim.set_colors({"Aa":"#FF0000", "Bb": "#00FF00", "Cc": "#0000FF"})
 	#new_sim.plot_Occ(20)
-	new_sim.plot_trajectory(30)
+	new_sim.plot_hist(30,axis = "z")
 	#print(new_sim.get_species())
 	#print("pOcc")
 	#print(new_sim.get_pOcc_mean())
