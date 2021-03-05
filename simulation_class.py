@@ -206,36 +206,4 @@ class MesoRDsimulation:
 			self.color_list = color_set
 		else:
 			raise Exception("the keys does not match")#Need a more specific exception
-		
 
-# for testing purposes
-if __name__ == "__main__":
-	new_sim = MesoRDsimulation('simulation_example',0.01)
-	new_sim.set_species_order(["Aa","Bb","Cc"])
-	#new_sim.plot_Occ(20)
-	print(new_sim.color_list)
-	#new_sim.set_colors({"Aa":"#FF0000", "Bb": "#00FF00", "Cc": "#0000FF"})
-	#new_sim.plot_Occ(20)
-	new_sim.plot_hist(30,axis = "z")
-	#print(new_sim.get_species())
-	#print("pOcc")
-	#print(new_sim.get_pOcc_mean())
-	#print(new_sim.get_pOcc_mean(20))
-	#print(new_sim.get_pOcc_sd())
-	#print(new_sim.get_pOcc_sd(20))
-	#print("D")
-	#print(new_sim.get_D_mean())
-	#print(new_sim.get_D_sd())
-
-	#print(new_sim.get_D_mean(20))
-	#print(new_sim.get_D_sd(20))
-	#print("DT")
-	#print(new_sim.get_DT_mean())
-	#print(new_sim.get_DT_sd())
-
-	#print(new_sim.get_pOcc_mean())
-	#new_sim.set_species_order(["Aa","Bb","Cc"])
-	#print(new_sim.get_species())
-	#print(new_sim.get_pOcc_mean())
-	# should give an exception
-	#new_sim = MesoRDsimulation('simulation_ample','0.01')
