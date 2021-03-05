@@ -1,7 +1,11 @@
-### TODO:
-###  - give the exception a good text
-###  - add caching, try @lru_cache:
-###      from functools import lru_cache
+### An class for reading MesoRD simulations and caluclation:
+###  - occupancies
+###  - diffusion coefficients
+###  - dwell time
+### of the different species.
+
+### Might add caching(try @lru_cache ; from functools import lru_cache)
+### later efter checking some things.
 
 import pandas as pd
 import numpy as np
