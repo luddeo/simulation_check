@@ -54,8 +54,16 @@ print("---- plot trajectory, ID = 30 ----")
 new_sim.plot_trajectory(30)
 
 print()
+print("---- plot trajectory, ID = 30, lower = 20, upper = 20 ----")
+new_sim.plot_trajectory(30, lower_time = 20, upper_time = 30)
+
+print()
 print("---- plot trajectory radial, ID = 30 ----")
 new_sim.plot_trajectory_radial(30)
+
+print()
+print("---- plot trajectory radial, ID = 30, lower = 20, upper = 20 ----")
+new_sim.plot_trajectory_radial(30, lower_time = 20, upper_time = 30)
 
 print()
 print("---- plot histogram ----")

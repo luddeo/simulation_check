@@ -1,4 +1,4 @@
-### An class for reading MesoRD simulations and caluclation:
+### An class for reading MesoRD simulations and calculating:
 ###  - occupancies
 ###  - diffusion coefficients
 ###  - dwell time
@@ -260,7 +260,7 @@ class MesoRDsimulation:
 		ax.legend(loc=0)
 		plt.show()
 	
-	def plot_trajectory(self, id, axis = "z"):
+	def plot_trajectory(self, id, axis = "z", lower_time = float("-inf") , upper_time = float("inf")):
 		''' Plots a trajectory projected down to a plane. The trajectory
 			parts are coloured according to which species that part is.
 
@@ -270,32 +270,37 @@ class MesoRDsimulation:
 					The ID of the trajectory.
 				axis: string ("x", "y" or "z")
 					The axis that is normal to the plane of projection.
+				lower_time: number
+					The lower time threshold of trajectory plotted
+				upper_time: number
+					The upper time threshold of trajectory plotted
 		'''
+		threshold_test = (self.time.values >= lower_time) & (self.time.values < upper_time)
 		fig, ax = plt.subplots()
 		if axis == "x":
-			coord1 = self.cube_size*self.y_coord.iloc[:,id]
-			coord2 = self.cube_size*self.z_coord.iloc[:,id]
+			coord1 = self.cube_size*self.y_coord.iloc[threshold_test,id]
+			coord2 = self.cube_size*self.z_coord.iloc[threshold_test,id]
 			ax.set_xlabel(r'y-axis')
 			ax.set_ylabel(r'z-axis')
 		elif axis == "y":
-			coord1 = self.cube_size*self.x_coord.iloc[:,id]
-			coord2 = self.cube_size*self.z_coord.iloc[:,id]
+			coord1 = self.cube_size*self.x_coord.iloc[threshold_test,id]
+			coord2 = self.cube_size*self.z_coord.iloc[threshold_test,id]
 			ax.set_xlabel(r'x-axis')
 			ax.set_ylabel(r'z-axis')
 		elif axis == "z":
-			coord1 = self.cube_size*self.x_coord.iloc[:,id]
-			coord2 = self.cube_size*self.y_coord.iloc[:,id]
+			coord1 = self.cube_size*self.x_coord.iloc[threshold_test,id]
+			coord2 = self.cube_size*self.y_coord.iloc[threshold_test,id]
 			ax.set_xlabel(r'x-axis')
 			ax.set_ylabel(r'y-axis')
 		else:
 			raise ValueError(axis + " is not a correct axis")
-		local_species_list = self.species.iloc[:,id]
+		local_species_list = self.species.iloc[threshold_test,id]
 		for i in range(len(coord1)-1):
 			ax.plot(coord1.iloc[i:(i+2)], coord2.iloc[i:(i+2)], color=self.color_list[local_species_list.iloc[i]])
 		ax.set_aspect(1)
 		plt.show()
 		
-	def plot_trajectory_radial(self, id, axis = "x"):
+	def plot_trajectory_radial(self, id, axis = "x", lower_time = float("-inf") , upper_time = float("inf")):
 		''' Plots the distance of the particle from the axis and the axis it self.
 			Like cylindrical coordinates without the angle. The trajectory
 			parts are coloured according to which species that part is.
@@ -306,26 +311,31 @@ class MesoRDsimulation:
 					The ID of the trajectory.
 				axis: string ("x", "y" or "z")
 					The axis that distance is defined from.
+				lower_time: number
+					The lower time threshold of trajectory plotted
+				upper_time: number
+					The upper time threshold of trajectory plotted
 		'''
+		threshold_test = (self.time.values >= lower_time) & (self.time.values < upper_time)
 		fig, ax = plt.subplots()
 		if axis == "x":
-			coord1 = self.cube_size*self.x_coord.iloc[:,id]
-			coord2 = self.cube_size*np.sqrt(self.y_coord.iloc[:,id].pow(2) + self.z_coord.iloc[:,id].pow(2))
+			coord1 = self.cube_size*self.x_coord.iloc[threshold_test,id]
+			coord2 = self.cube_size*np.sqrt(self.y_coord.iloc[threshold_test,id].pow(2) + self.z_coord.iloc[threshold_test,id].pow(2))
 			ax.set_xlabel(r'x-axis')
 			ax.set_ylabel(r'radial')
 		elif axis == "y":
-			coord1 = self.cube_size*self.y_coord.iloc[:,id]
-			coord2 = self.cube_size*np.sqrt(self.z_coord.iloc[:,id].pow(2) + self.x_coord.iloc[:,id].pow(2))
+			coord1 = self.cube_size*self.y_coord.iloc[threshold_test,id]
+			coord2 = self.cube_size*np.sqrt(self.z_coord.iloc[threshold_test,id].pow(2) + self.x_coord.iloc[threshold_test,id].pow(2))
 			ax.set_xlabel(r'y-axis')
 			ax.set_ylabel(r'radial')
 		elif axis == "z":
-			coord1 = self.cube_size*self.z_coord.iloc[:,id]
-			coord2 = self.cube_size*np.sqrt(self.y_coord.iloc[:,id].pow(2) + self.x_coord.iloc[:,id].pow(2))
+			coord1 = self.cube_size*self.z_coord.iloc[threshold_test,id]
+			coord2 = self.cube_size*np.sqrt(self.y_coord.iloc[threshold_test,id].pow(2) + self.x_coord.iloc[threshold_test,id].pow(2))
 			ax.set_xlabel(r'z-axis')
 			ax.set_ylabel(r'radial')
 		else:
 			raise ValueError(axis + " is not a correct axis")
-		local_species_list = self.species.iloc[:,id]
+		local_species_list = self.species.iloc[threshold_test,id]
 		for i in range(len(coord1)-1):
 			ax.plot(coord1.iloc[i:(i+2)], coord2.iloc[i:(i+2)], color=self.color_list[local_species_list.iloc[i]])
 		ax.set_aspect(1)
@@ -341,13 +351,14 @@ class MesoRDsimulation:
 					The axis position values are taken from.
 				bins: integer
 					The number of bins to use in the histogram.
+
 		'''
 		if axis == "x":
 			coord1 = (self.cube_size*self.x_coord).melt()
 		elif axis == "y":
-			coord1 = self.cube_size*self.y_coord.melt()
+			coord1 = (self.cube_size*self.y_coord).melt()
 		elif axis == "z":
-			coord1 = self.cube_size*self.z_coord.melt()
+			coord1 = (self.cube_size*self.z_coord).melt()
 		else:
 			raise ValueError(axis + " is not a correct axis")
 		fig, ax = pd.DataFrame({'species': self.species.melt()['value'], 'coord':coord1['value']}).hist(by = 'species', bins = bins)
